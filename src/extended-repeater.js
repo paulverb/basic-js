@@ -16,20 +16,66 @@ const { NotImplementedError } = require('../extensions/index.js');
  *
  */
 function repeater(str, options) {
-  let result = str;
-  let addition = options.addition ? options.addition : '';
-  let separator = options.separator ? options.separator : '+';
-  let additionSeparator = options.additionSeparator ? options.additionSeparator : '|';
-  if(options.additionRepeatTimes) addition = addition.repeat(options.additionRepeatTimes).split('').join(additionSeparator);
-  result += addition;
-  if (options.repeatTimes) result = result.repeat(options.repeatTimes)
+  if (typeof str !== 'string'){
+    str = String(str);
+  }
 
-  if (options.addition) additionChunk += options.addition;
-  if (options.additionSeparator) additionSep = options.additionSeparator;
+  
+  let addition = null;
+  let separator;
+  if (options.hasOwnProperty('separator')){
+    separator = String(options.separator)
+  } else {
+    separator = '+';
+  }
+  let additionSeparator;
+  if (options.hasOwnProperty('additionSeparator')){
+    additionSeparator = String(options.additionSeparator)
+  } else {
+    additionSeparator = '|';
+  }
+  //let additionJoiner;
 
 
-  if (options.addition) chunk += options.addition;
-  if (options.additionSeparator) chunk += options.a
+
+  if (options.hasOwnProperty('addition')) {
+    addition = String(options.addition);
+  } 
+
+  if (options.addition && !options.repeatTimes && !options.additionRepeatTimes) {
+    return str + addition
+  }
+
+  if (addition && options.additionRepeatTimes) {
+    additionJoiner = Array(options.additionRepeatTimes).fill(addition).join(additionSeparator)
+    if (options.repeatTimes) {
+      return Array(options.repeatTimes).fill(str + additionJoiner).join(separator)
+    }
+    else {
+      return str + additionJoiner
+    }
+  }
+  
+  
+
+  if (addition && !options.additionRepeatTimes) {
+    if(options.repeatTimes) {
+      let strPlusAddition = str + addition;
+      return Array(options.repeatTimes).fill(strPlusAddition).join(separator)
+    } else {
+      return str + addition;
+    }
+  }
+
+  if (!addition) {
+    if (options.repeatTimes){
+      return Array(options.repeatTimes).fill(str).join(separator)
+    } else {
+      return str;
+    }
+      
+  }
+  
 }
 
 module.exports = {

@@ -16,35 +16,36 @@ const { NotImplementedError } = require('../extensions/index.js');
 function transform(arr) {
   if (!Array.isArray(arr)) throw new Error("'arr' parameter must be an instance of the Array!");
   let result = [];
+  let controls = new Set(['--discard-next', '--discard-prev', '--double-next', '--double-prev']);
+  let nextDiscarded = false;
 
-  let previous = null;
-  for (let i = 0; i < arr.length - 1;) {
-    if (Number.isInteger(arr[i])) {
-      result.push(arr[i]);
-      previous = i;
-      i++;
-    }
-    if (arr[i] === '--discard-prev' && previous !== null && arr[i-1]) {
-        result.pop();
-        previous = null;
-        i++;
+  for (let i = 0; i < arr.length; i++) {
+    if(!(controls.has(arr[i]))) {
+      result.push(arr[i])
+    } else {
+      if(arr[i] === '--discard-next') {
+        if (arr.length > i + 1) {
+          i++;
+          nextDiscarded = true;
+        }
       }
-    
-    if (arr[i] === '--double-prev' && previous !== null) {
-      result.push(previous);
-      previous = null;
-      i++;
-    }
-
-    if (arr[i] === '--discard-next') {
-      i += 2;
-      previous = null;
-    }
-
-    if (arr[i] === '--double-next' && arr[i+1]) {
-      result.push(arr[i+1])
+      if(arr[i] === '--discard-prev' && !nextDiscarded) {
+        if (result.length) {
+          result.pop();
+          nextDiscarded = false;
+        }
+      }
+      if (arr[i] === '--double-next' && arr.length > i+1) {
+        result.push(arr[i+1]);
+        nextDiscarded = false;
+      }
+      if (arr[i] === '--double-prev' && result.length && !nextDiscarded) {
+        result.push(result[result.length - 1])
+        nextDiscarded = false;
+      }
     }
   }
+  console.log('array:', arr, 'result:', result)
   return result;
 }
 

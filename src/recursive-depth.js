@@ -18,8 +18,11 @@ class DepthCalculator {
   }
 
   calculateDepth(arr) {
-    if (Array.isArray(arr) && arr.length === 1) return 1;
-    return Array.isArray(arr) ? 1 + Math.max(...arr.map(this.calculateDepth)) : 0;
+    if (Array.isArray(arr)) {
+      return 1 + Math.max(0, ...arr.map(this.calculateDepth));
+    } else {
+      return 0;
+    }
   }
 }
 
